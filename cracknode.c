@@ -119,7 +119,17 @@ main(int argc, char **argv)
 	if (p == MAP_FAILED)
 		err(1, "mmap %s", argv[1]);
 
+	if (memcmp(p, "\177ELF", 4))
+		err(1, "bad ELF magic");
+
 	Elf64_Ehdr *eh = (void *) p;
+
+	if (eh->e_type != ET_EXEC)
+		err(1, "not an executable");
+
+	if (eh->e_machine != EM_X86_64)
+		err(1, "not an x86_64 executable");
+
 	Elf64_Shdr *sh = (void *) &p[eh->e_shoff];
 
 	if (eh->e_shstrndx == 0)
