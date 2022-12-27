@@ -15,13 +15,11 @@
 CFLAGS	= -Wall -Wextra -Os
 
 .PHONY: all
-all:	cracknode hacknode
+all:	hacknode
 
 .PHONY: clean
 clean:
-	$(RM) cracknode hacknode
-
-cracknode: cracknode.c
+	$(RM) hacknode
 
 hacknode: hacknode.c version.ld
 	$(CC) -o $@ $(CFLAGS) -fPIC -shared $< -ldl -Wl,-E -Wl,-e,_start -Wl,--version-script,version.ld

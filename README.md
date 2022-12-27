@@ -4,9 +4,11 @@ To all you people complaining `node` doesn't run on your ancient distro:
 
 Here is what it does:
 
-1. `cracknode` patches out newer glibc symbols from the `node` executable
+1. `hacknode -patch node` patches out newer glibc symbols from the `node`
+    executable
 
-2. `hacknode` adds runtime support for the goodies old systems lack
+2. `hacknode node script.js` adds runtime support for the goodies old systems
+    lack
 
 Run at your own risk. As the ancient proverb goes: THE SOFTWARE IS PROVIDED
 "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES.
@@ -22,7 +24,7 @@ Build & apply:
     $ make
 
     # also run this once and make sure node is writable
-    $ ./cracknode `which node`
+    $ ./hacknode -patch `which node`
 
     # invoke node like so from now on
     $ ./hacknode node -p 'console.log("Hello, crackers!")'
