@@ -15,8 +15,8 @@
 #define _GNU_SOURCE
 #include <dlfcn.h>
 #include <elf.h>
+#include <err.h>
 #include <fcntl.h>
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #define arraylen(a)	(sizeof(a) / sizeof(*a))
+#define die(...)	errx(1, __VA_ARGS__)
 
 struct buf
 {
@@ -37,20 +38,6 @@ patch(char *filename);
 
 int	(*nextfcntl64v228)(int fd, int cmd, ...);
 int	(*nextfcntlv225)(int fd, int cmd, ...);
-
-// don't use stdout/stderr, not initialized
-__attribute__((noreturn))
-void
-die(char *fmt, ...)
-{
-	va_list ap;
-	char buf[512];
-
-	va_start(ap, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, ap);
-	printf("%s\n", buf);
-	_exit(1);
-}
 
 __attribute__((constructor, visibility("hidden")))
 void
@@ -75,7 +62,12 @@ go(long *arg)
 	char	preload[1<<12];
 
 	// arg[1] is the full path to ourselves
-	snprintf(preload, sizeof(preload), "LD_PRELOAD=%s", (char*) arg[1]);
+	p = (char*) arg[1];
+	if (sizeof("LD_PRELOAD=")+strlen(p) >= sizeof(preload))
+		die("executable path too long");
+
+	strcpy(preload, "LD_PRELOAD=");
+	strcat(preload, p);
 
 	fd = open("/proc/self/cmdline", O_RDONLY);
 	if (fd < 0)
